@@ -105,15 +105,36 @@ namespace brainfuck
                         }
                         else
                         {
-                            stack.Push(pc++);
+                            pc++;
                         }
                         break;
                     case ']':
-                        var old_pc = ++pc;
-                        pc = stack.Pop();
+                        var old_pc = pc;
                         if (jump_table[pc] == -1)
                         {
-                            jump_table[pc] = old_pc;
+                            int loopCount = 1;
+                            while (loopCount != 0)
+                            {
+                                c = program[--pc];
+                                if (c == ']')
+                                {
+                                    ++loopCount;
+                                }
+                                else if (c == '[')
+                                {
+                                    --loopCount;
+                                }
+                            }
+                            jump_table[old_pc] = pc;
+                        }
+                        else
+                        {
+                            pc = jump_table[pc];
+                        }
+
+                        if (jump_table[pc] == -1)
+                        {
+                            jump_table[pc] = ++old_pc;
                         }
                         break;
                     default:
