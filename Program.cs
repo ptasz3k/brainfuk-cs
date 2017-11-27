@@ -29,6 +29,12 @@ namespace brainfuck
 
             Console.WriteLine("\nStarting program in 3.. 2.. 1.. Now!\n");
 
+            var jump_table = new int[_max_mem];
+            for (var i = 0; i < _max_mem; ++i)
+            {
+                jump_table[i] = -1;
+            }
+
             var memory = new byte[_max_mem];
             var stack = new Stack<int>();
             int pc = 0;
@@ -71,22 +77,31 @@ namespace brainfuck
                     case '[':
                         if (memory[ptr] == 0)
                         {
-                            int loopCount = 1;
-                            int start_pc = pc;
-                            while (loopCount != 0)
+                            if (jump_table[pc] == -1)
                             {
-                                c = program[++pc];
-                                if (c == '[')
+                                int loopCount = 1;
+                                int start_pc = pc;
+                                while (loopCount != 0)
                                 {
-                                    ++loopCount;
+                                    c = program[++pc];
+                                    if (c == '[')
+                                    {
+                                        ++loopCount;
+                                    }
+                                    else if (c == ']')
+                                    {
+                                        --loopCount;
+                                    }
                                 }
-                                else if (c == ']')
-                                {
-                                    --loopCount;
-                                }
-                            }
 
-                            pc++;
+                                pc++;
+
+                                jump_table[start_pc] = pc;
+                            }
+                            else
+                            {
+                                pc = jump_table[pc];
+                            }
                         }
                         else
                         {
@@ -94,7 +109,12 @@ namespace brainfuck
                         }
                         break;
                     case ']':
+                        var old_pc = ++pc;
                         pc = stack.Pop();
+                        if (jump_table[pc] == -1)
+                        {
+                            jump_table[pc] = old_pc;
+                        }
                         break;
                     default:
                         break;
