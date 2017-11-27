@@ -49,11 +49,11 @@ namespace brainfuck
                         ++pc;
                         break;
                     case '+':
-                        memory[ptr] += 1;
+                        memory[ptr]++;
                         ++pc;
                         break;
                     case '-':
-                        memory[ptr] -= 1;
+                        memory[ptr]--;
                         ++pc;
                         break;
                     case '.':
@@ -96,7 +96,6 @@ namespace brainfuck
                     case ']':
                         pc = stack.Pop();
                         break;
-
                     default:
                         break;
 
